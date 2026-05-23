@@ -5,25 +5,27 @@ import com.frax.BackEnd.dto.UserRegistrationDTO;
 import com.frax.BackEnd.entity.UserEntity;
 import com.frax.BackEnd.mapper.UserMapper;
 import com.frax.BackEnd.repository.UserRepo;
-import java.util.List;
 
+import lombok.RequiredArgsConstructor;
+
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
     
-    private UserMapper userMapper;
-    private PasswordEncoder passwordEncoder;
-    private UserRepo userRepo;
+    private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
+    private final UserRepo userRepo;
     
-    public UserService(UserRepo userRepo, UserMapper userMapper, PasswordEncoder passwordEncoder) {
-        this.userRepo = userRepo;
-        this.userMapper = userMapper;
-        this.passwordEncoder = passwordEncoder;
-    }
 
-    public UserDTO register(UserRegistrationDTO registrationDTO) {
+    public UserDTO register(UserRegistrationDTO registrationDTO)  {
         
         UserEntity user = userMapper.toEntity(registrationDTO);
         user.setPassword(passwordEncoder.encode(registrationDTO.getPassword()));
@@ -31,29 +33,29 @@ public class UserService {
         return userMapper.toDTO(savedUser);
     }
 
-    public UserDTO logIn(String email, String password) {
+    public Map<String , String> getUserProfile(Authentication authentication) {
+        String email = authentication.getName();
+        UserEntity user = userRepo.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("Utente Non Trovato: " + email));
         
-        // Trova l'utente per email
-        UserEntity user = userRepo.findByEmail(email).orElseThrow(() -> new RuntimeException("Utente o password errati"));
-        
-        // Verifica la password
-        if (passwordEncoder.matches(password, user.getPassword())) {
-            return userMapper.toDTO(user);
-        } else {
-            throw new RuntimeException("Utente o password errati");
-        }
+        return Map.of(
+            "name", user.getName(),
+            "surname", user.getSurname(),
+            "email", user.getEmail(),
+            "isAdmin", user.getIsAdmin().toString()
+        );
     }
-
     public void deleteUser(String id) {
         userRepo.deleteById(id);
     }
-
+    
+    // Metodo per ottenere tutti gli utenti
     public List<UserDTO> getAllUsers() {
         List<UserEntity> users = userRepo.findAll();
         return users.stream().map(userMapper::toDTO).collect(java.util.stream.Collectors.toList());
     }
 
-
+   
 }
 
 

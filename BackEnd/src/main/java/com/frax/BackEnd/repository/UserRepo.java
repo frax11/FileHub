@@ -8,12 +8,7 @@ import com.frax.BackEnd.entity.UserEntity;
 
 @Repository
 public interface UserRepo extends JpaRepository<UserEntity, String> {
-   
-    Optional<UserEntity> findById(String id);
     Optional<UserEntity> findByEmail(String email);
-
-    void deleteById(String id);
-
-     boolean existsByEmail(String email);
+    Boolean existsByEmail(String email);
 
 }

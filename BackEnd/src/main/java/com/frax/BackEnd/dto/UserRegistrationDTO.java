@@ -1,20 +1,24 @@
 package com.frax.BackEnd.dto;
 
+
+import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
+@AllArgsConstructor
 @Data
 public class UserRegistrationDTO {
 
-    @NotBlank(message = "Nome è obbligatorio")
+    @NotBlank(message = "Name è obbligatoria")
     private String name;
-    
-    @NotBlank(message = "Cognome è obbligatorio")
+
+    @NotBlank(message = "Surname è obbligatoria")
     private String surname;
 
-    @NotBlank(message = "Email è obbligatoria")
+    @NotBlank(message = "Conferma la email è obbligatoria")
     @Email(message = "Email non valida")
     private String email;
 
@@ -22,11 +26,9 @@ public class UserRegistrationDTO {
     @Size(min=6,message="password deve essere almeno di 6 caratteri")
     private String password;
 
-    public UserRegistrationDTO(String name, String surname, String email, String password) {
-        this.name = name;
-        this.surname = surname;
-        this.email = email;
-        this.password = password;
-    }
+    @Nullable
+    private Boolean isAdmin;
+
+    
 
 }

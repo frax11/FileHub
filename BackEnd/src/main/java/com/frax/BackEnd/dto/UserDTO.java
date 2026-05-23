@@ -1,18 +1,18 @@
 package com.frax.BackEnd.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
+@AllArgsConstructor
 @Data
 public class UserDTO {
+
+    private String id;
     private String name;
     private String surname;
     private String email;
-    private Boolean isAdmin;
+    private boolean isAdmin;
+
    
-    public UserDTO(String name, String surname, String email, Boolean isAdmin) {
-        this.name = name;
-        this.surname = surname;
-        this.email = email;
-        this.isAdmin = isAdmin;
-    }
+    
 }
