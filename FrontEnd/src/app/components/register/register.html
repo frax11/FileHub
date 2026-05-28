@@ -1,0 +1,39 @@
+<div class="container">
+    <h2>Registrazione</h2>
+    @if (successMessage) {
+        <div class="alert success">
+            {{ successMessage }}
+        </div>
+    }
+    @if(errorMessage) {
+        <div class="alert error">
+            {{ errorMessage }}
+        </div>
+    }
+    
+    <form (ngSubmit)="onSubmit()">
+        <div>
+            <label>Email:</label>
+            <input type="email" [(ngModel)]="user.email" name="email" required>
+        </div>
+        
+        <div>
+            <label>Nome:</label>
+            <input type="text" [(ngModel)]="user.name" name="name" required>
+        </div>
+        
+        <div>
+            <label>Cognome:</label>
+            <input type="text" [(ngModel)]="user.surname" name="surname" required>
+        </div>
+        
+        <div>
+            <label>Password:</label>
+            <input type="password" [(ngModel)]="user.password" name="password" required>
+        </div>
+        
+        <button type="submit">Registrati</button>
+    </form>
+    
+    <p>Hai già un account? <a routerLink="/login">Login</a></p>
+</div>

@@ -11,6 +11,8 @@ public interface UserMapper {
     
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "isAdmin", ignore = true)
+    @Mapping(target = "isEnabled", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
     UserEntity toEntity(UserRegistrationDTO registrationDTO);
 
     UserDTO toDTO(UserEntity userEntity);
