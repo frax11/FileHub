@@ -1,15 +1,16 @@
     package com.frax.BackEnd.controller;
 
-    import java.util.Map;
-
+    import jakarta.servlet.http.HttpSession;
     import lombok.RequiredArgsConstructor;
 
     import org.springframework.http.ResponseEntity;
     import org.springframework.security.authentication.AuthenticationManager;
     import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
     import org.springframework.security.core.Authentication;
+    import org.springframework.security.core.context.SecurityContext;
     import org.springframework.security.core.context.SecurityContextHolder;
     import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
+    import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
     import org.springframework.web.bind.annotation.RequestMapping;
     import org.springframework.web.bind.annotation.RestController;
 
@@ -32,20 +33,22 @@
     @RequestMapping("/auth")
     public class AuthController {
         
-        private final UserInfoService userService;
+        private final UserInfoService userInfoService;
         private final AuthenticationManager authenticationManager;
 
 
         
         @PostMapping("/login")
-        public ResponseEntity<?> logIn(@Valid @RequestBody UserLoginDTO loginDTO) {
+        public ResponseEntity<?> logIn(@Valid @RequestBody UserLoginDTO loginDTO, HttpServletRequest request,HttpServletResponse response) {
             try{
-                Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginDTO.getEmail(), loginDTO.getPassword()));  
-                // 2. Salva l'autenticazione nel contesto (Spring lo farà anche automaticamente)
+                Authentication authentication   = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(loginDTO.getEmail(), loginDTO.getPassword()));
+
                 SecurityContextHolder.getContext().setAuthentication(authentication);
-                // 3. A questo punto, il cookie JSESSIONID è già stato creato da Spring
-                //Angular lo riceverà automaticamente nell'header Set-Cookie della risposta, e lo invierà nelle richieste successive.
+                HttpSession session = request.getSession(true);
+                SecurityContext securityContext = SecurityContextHolder.getContext();
+                HttpSessionSecurityContextRepository securityContextRepository = new HttpSessionSecurityContextRepository();
+                securityContextRepository.saveContext(securityContext, request, response);
                 return ResponseEntity.ok("Login effettuato");
                     
             }catch(Exception e){
@@ -56,9 +59,9 @@
         }
 
         @PostMapping("/register")
-        public ResponseEntity<?> register(@Valid @RequestBody UserRegistrationDTO userDto) {
+        public ResponseEntity<?> register(@Valid @RequestBody UserRegistrationDTO userDto, HttpServletRequest request,HttpServletResponse response) {
             try {
-                UserDTO createdUser = userService.saveUser(userDto);
+                UserDTO createdUser = userInfoService.saveUser(userDto);
                 return ResponseEntity.ok(createdUser);
             } catch (Exception e) {
                 return ResponseEntity.badRequest().body("Errore durante la registrazione: " + e.getMessage());
@@ -79,12 +82,6 @@
             return ResponseEntity.ok("Logout effettuato");
         }
 
-        @PostMapping("/me")
-        public ResponseEntity<?> getMe(Authentication authentication) {
-            if(authentication == null || !authentication.isAuthenticated()) {
-                return ResponseEntity.status(401).body("Utente non autenticato");
-            }
-            return ResponseEntity.ok(authentication.getPrincipal());
-        }
+
 
     }

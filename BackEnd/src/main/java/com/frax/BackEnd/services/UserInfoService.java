@@ -1,10 +1,8 @@
 package com.frax.BackEnd.services;
 
-import com.frax.BackEnd.controller.AuthController;
-import java.util.List;
 import java.util.Optional;
 
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.jspecify.annotations.NonNull;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -20,6 +18,7 @@ import com.frax.BackEnd.mapper.UserMapper;
 import com.frax.BackEnd.repository.UserRepo;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -29,7 +28,7 @@ public class UserInfoService implements UserDetailsService {
     private final UserMapper userMapper;
 
     @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(@NonNull String email) throws UsernameNotFoundException {
         Optional<UserEntity> user = userRepo.findByEmail(email);
         if (user.isEmpty()) {
             throw new UsernameNotFoundException("Utente non trovato con email: " + email);
@@ -43,11 +42,11 @@ public class UserInfoService implements UserDetailsService {
                     .build();
             
     }
-
+    @Transactional
     public UserDTO saveUser(UserRegistrationDTO user) {
-        user.setEmail(user.getEmail().toLowerCase());
-        user.setSurname(user.getSurname().toLowerCase());
-        user.setName(user.getSurname().toLowerCase());
+        user.setEmail(user.getEmail().toUpperCase());
+        user.setSurname(user.getSurname().toUpperCase());
+        user.setName(user.getSurname().toUpperCase());
 
         UserEntity userEntity = userMapper.toEntity(user);
         userEntity.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -68,5 +67,7 @@ public class UserInfoService implements UserDetailsService {
         }
         return userMapper.toDTO(user);        
     }
+
+
     
 }
