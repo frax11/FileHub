@@ -31,9 +31,6 @@ public class SharedFile {
     @Column(name = "shared_at")
     private LocalDateTime sharedAt = LocalDateTime.now();
 
-    @Column(name = "permission")
-    private String permission = "READ";
-
     @Column(name = "is_active")
     private boolean isActive = true;
 

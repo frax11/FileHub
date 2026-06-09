@@ -22,35 +22,31 @@ import lombok.RequiredArgsConstructor;
 @Configuration
 @RequiredArgsConstructor
 @EnableWebSecurity
-
 public class SecurityConfig {
 
-    @Value("${csrf.enabled}")
-    private boolean csrfEnabled;
+
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
          http
             .cors(cors ->cors.configurationSource(corsConfigurationSource()))
-            .csrf(crsf -> {
-                if(csrfEnabled) {
-                    crsf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
-                }else{
-                    crsf.disable();
-                }
-            })
+
+            .csrf(crsf -> crsf
+                    .ignoringRequestMatchers("/user/csrf")
+                    .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+            )
+                 
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/auth/**").permitAll()
+                .requestMatchers("/user/**").permitAll()
                 .anyRequest().authenticated()
             )
 
             .sessionManagement(session -> session
                     .sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
-                    .invalidSessionUrl("/auth/session-expired")
+                    .invalidSessionUrl("/user/login")
                     .maximumSessions(1)
                     .maxSessionsPreventsLogin(false)
             )
-            //Autenticazione Custom
             .formLogin(AbstractHttpConfigurer::disable)
             .httpBasic(AbstractHttpConfigurer::disable);
 

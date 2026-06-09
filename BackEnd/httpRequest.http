@@ -12,8 +12,8 @@ content-type : {{Content-Type}}
     "email": "sample@example.com",
     "password": "samplepassword"
 }
-
-
+sample@example.com
+samplepassword
 ### 2. Login
 POST {{basseUrl}}/login
 content-type : {{Content-Type}}
