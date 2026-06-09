@@ -1,67 +1,81 @@
 import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { UserService } from '../../services/user.service';
 import { Router, RouterLink } from '@angular/router';
-import { AuthService } from '../../services/auth';
-import { User } from '../../models/user';
+import { FormsModule, NgForm } from '@angular/forms';
 
 @Component({
-    selector: 'app-register',
-    standalone: true,
-    imports: [CommonModule, FormsModule, RouterLink],
-    templateUrl: './register.html',
-    styleUrls: ['./register.scss']
+  selector: 'app-register',
+  imports: [FormsModule, RouterLink],
+  templateUrl: './register.html',
+  styleUrl: './register.scss',
+  standalone: true,
 })
-export class register {
-    user: User = {
-        email: '',
-        name: '',
-        surname: '',
-        password: ''
-    };
-    errorMessage = '';
-    successMessage = '';
-    isLoading = false;
+export class Register {
+  email = '';
+  password = '';
+  name = '';
+  surname = '';
+  errorMessage = '';
+  isLoading = false;
+  csrfReady = false; // ← flag per sapere se CSRF è pronto
 
-    constructor(
-        private authService: AuthService, 
-        private router: Router
-    ) {}
+  constructor(
+    private userService: UserService,
+    private router: Router,
+  ) {}
 
-    onSubmit(): void {
-        if (this.isLoading) return;
-        
-        this.errorMessage = '';
-        this.successMessage = '';
-        this.isLoading = true;
+  ngOnInit(): void {
+    this.userService.initializeCsrf().subscribe({
+      next: (response: any) => {
+        console.log('Token ricevuto:', response.token);
+        this.userService.setCsrfToken(response.token); // ← salva
+        this.csrfReady = true;
+      },
+      error: (err) => console.error(err),
+    });
+  }
 
-        const userData = {
-            name: this.user.name,
-            surname: this.user.surname,
-            email: this.user.email,
-            password: this.user.password
-        };
-
-        console.log('Registrazione:', userData);
-
-        this.authService.register(userData).subscribe({
-            next: () => {
-                this.successMessage = 'Registrazione completata!';
-                this.isLoading = false;
-                setTimeout(() => this.router.navigate(['/login']), 2000);
-            },
-            error: (err) => {
-                console.error('Errore:', err);
-                this.isLoading = false;
-                
-                if (err.status === 400) {
-                    this.errorMessage = err.error?.message || 'Dati non validi. Controlla i campi.';
-                } else if (err.status === 409) {
-                    this.errorMessage = 'Email già registrata.';
-                } else {
-                    this.errorMessage = 'Errore durante la registrazione. Riprova.';
-                }
-            }
-        });
+  async onSubmit(form: NgForm): Promise<void> {
+    // 1. Verifica se il form è valido
+    if (form.invalid) {
+      Object.keys(form.controls).forEach((key) => {
+        form.controls[key].markAsTouched();
+      });
+      this.router.navigate(['home']);
+      return;
     }
+
+    // 2. Verifica che CSRF sia pronto (opzionale)
+    if (!this.csrfReady) {
+      this.errorMessage = 'Attendi, connessione al server in corso...';
+      return;
+    }
+
+    // 3. Reset errori e attiva loading
+    this.errorMessage = '';
+    this.isLoading = true;
+
+    console.log(' Tentativo registrazione per:', this.email);
+
+    // 4. Chiamata al backend
+    this.userService
+      .register({
+        email: this.email,
+        password: this.password,
+        name: this.name,
+        surname: this.surname,
+      })
+      .subscribe({
+        next: (response) => {
+          console.log(' Registrazzione riuscita:', response);
+          this.isLoading = false;
+          this.router.navigate(['/home']);
+        },
+        error: (err) => {
+          console.error('Registrazione fallita:', err);
+          this.errorMessage = 'Email o password non validi';
+          this.isLoading = false;
+        },
+      });
+  }
 }

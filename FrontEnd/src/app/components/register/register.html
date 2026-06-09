@@ -1,39 +1,91 @@
-<div class="container">
-    <h2>Registrazione</h2>
-    @if (successMessage) {
-        <div class="alert success">
-            {{ successMessage }}
-        </div>
+<!-- src/app/components/login/login.component.html -->
+<div class="register-container">
+  <div class="card">
+    <h2>🔐 Register</h2>
+    @if (errorMessage){
+      <div class="alert-error"> {{ errorMessage }} </div>
     }
-    @if(errorMessage) {
-        <div class="alert error">
-            {{ errorMessage }}
+    <form #registerForm="ngForm" (ngSubmit)="onSubmit(registerForm)">
+
+      <div class="form-group">
+
+        <label for="email">Email</label>
+
+        <input type="email"
+               id="email"
+               name="email"
+               [(ngModel)]="email"
+               #emailInput="ngModel"
+               required
+               email>
+
+
+        @if (emailInput.invalid && emailInput.touched){
+          <div class="field-error"> {{ errorMessage }}
+            @if(emailInput.errors?.['required']){
+              <span>Email obbligatoria</span>
+            }
+            @if(emailInput.errors?.['email']){
+              <span>Email non valida</span>
+            }
+          </div>
+
+
+        }
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password"
+                 id="password"
+                 name="password"
+                 [(ngModel)]="password"
+                 #passwordInput="ngModel"
+                 required>
+          @if (passwordInput.invalid && passwordInput.touched){
+            <div class="field-error"> {{ errorMessage }}
+              <span>Password obbligatoria</span>
+            </div>
+          }
         </div>
-    }
-    
-    <form (ngSubmit)="onSubmit()">
-        <div>
-            <label>Email:</label>
-            <input type="email" [(ngModel)]="user.email" name="email" required>
+        <div class="form-group">
+          <label for="name">Nome</label>
+          <input type="name"
+                 id="name"
+                 name="name"
+                 [(ngModel)]="name"
+                 #nameInput="ngModel"
+                 required>
+          @if (nameInput.invalid && nameInput.touched){
+            <div class="field-error"> {{ errorMessage }}
+              <span>Nome obbligatorio</span>
+            </div>
+          }
         </div>
-        
-        <div>
-            <label>Nome:</label>
-            <input type="text" [(ngModel)]="user.name" name="name" required>
+        <div class="form-group">
+          <label for="surname">Cognome</label>
+          <input type="surname"
+                 id="surname"
+                 name="surname"
+                 [(ngModel)]="surname"
+                 #surnameInput="ngModel"
+                 required>
+          @if (surnameInput.invalid && surnameInput.touched){
+            <div class="field-error"> {{ errorMessage }}
+              <span>Cognome obbligatorio</span>
+            </div>
+          }
         </div>
-        
-        <div>
-            <label>Cognome:</label>
-            <input type="text" [(ngModel)]="user.surname" name="surname" required>
-        </div>
-        
-        <div>
-            <label>Password:</label>
-            <input type="password" [(ngModel)]="user.password" name="password" required>
-        </div>
-        
-        <button type="submit">Registrati</button>
+
+
+
+        <button type="submit" [disabled]="registerForm.invalid || isLoading">
+          {{ isLoading ? 'Caricamento...' : 'Accedi' }}
+        </button>
+      </div>
     </form>
-    
-    <p>Hai già un account? <a routerLink="/login">Login</a></p>
+
+    <p class="register-link">
+      hai già un account? <a routerLink="/login">Login</a>
+    </p>
+  </div>
 </div>

@@ -1,15 +1,16 @@
-import { ApplicationConfig, importProvidersFrom } from '@angular/core';
+import { ApplicationConfig } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { provideHttpClient, withInterceptorsFromDi, HTTP_INTERCEPTORS, withXsrfConfiguration } from '@angular/common/http';
 
 import { routes } from './app.routes';
-import { credentialsInterceptor } from './interceptors/credentials-interceptor';
+import { CredentialsInterceptor } from './interceptors/credentials.interceptor';
 
 export const appConfig: ApplicationConfig = {
     providers: [
         provideRouter(routes),
+
         provideHttpClient(
-            withInterceptorsFromDi(),      // permette di usare interceptor classici
+            withInterceptorsFromDi(),
             withXsrfConfiguration({
                 cookieName: 'XSRF-TOKEN',
                 headerName: 'X-XSRF-TOKEN'
@@ -17,7 +18,7 @@ export const appConfig: ApplicationConfig = {
         ),
         {
             provide: HTTP_INTERCEPTORS,
-            useClass: credentialsInterceptor,
+            useClass: CredentialsInterceptor,
             multi: true
         }
     ]

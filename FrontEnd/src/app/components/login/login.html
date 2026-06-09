@@ -1,23 +1,61 @@
-<div class="container">
-    <h2>Login</h2>
-    
-    <div *ngIf="errorMessage" class="alert error">
-        {{ errorMessage }}
-    </div>
-    
-    <form (ngSubmit)="onSubmit()">
-        <div>
-            <label>Email:</label>
-            <input type="email" [(ngModel)]="email" name="email" required>
-        </div>
-        
-        <div>
-            <label>Password:</label>
-            <input type="password" [(ngModel)]="password" name="password" required>
-        </div>
-        
-        <button type="submit">Accedi</button>
+<!-- src/app/components/login/login.component.html -->
+<div class="login-container">
+  <div class="card">
+    <h2>🔐 Login</h2>
+    @if (errorMessage){
+      <div class="alert alert-error"> {{ errorMessage }} </div>
+    }
+    <form #loginForm="ngForm" (ngSubmit)="onSubmit(loginForm)">
+
+      <div class="form-group">
+
+        <label for="email">Email</label>
+
+        <input type="email"
+               id="email"
+               name="email"
+               [(ngModel)]="email"
+               #emailInput="ngModel"
+               required
+               email>
+
+
+        @if (emailInput.invalid && emailInput.touched){
+          <div class="field-error"> {{ errorMessage }}
+          @if(emailInput.errors?.['required']){
+            <span>Email obbligatoria</span>
+          }
+            @if(emailInput.errors?.['email']){
+              <span>Email non valida</span>
+            }
+          </div>
+
+
+        }
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password"
+               id="password"
+               name="password"
+               [(ngModel)]="password"
+               #passwordInput="ngModel"
+               required>
+        @if (passwordInput.invalid && passwordInput.touched){
+          <div class="field-error"> {{ errorMessage }}
+              <span>Password obbligatoria</span>
+          </div>
+            }
+      </div>
+
+      <button type="submit" [disabled]="loginForm.invalid || isLoading">
+        {{ isLoading ? 'Caricamento...' : 'Accedi' }}
+      </button>
+      </div>
     </form>
-    
-    <p>Non hai un account? <a routerLink="/register">Registrati</a></p>
+
+    <p class="register-link">
+      Non hai un account? <a routerLink="/register">Registrati</a>
+    </p>
+  </div>
 </div>
