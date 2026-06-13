@@ -28,7 +28,6 @@ export class Register {
     this.userService.initializeCsrf().subscribe({
       next: (response: any) => {
         console.log('Token ricevuto:', response.token);
-        this.userService.setCsrfToken(response.token); // ← salva
         this.csrfReady = true;
       },
       error: (err) => console.error(err),

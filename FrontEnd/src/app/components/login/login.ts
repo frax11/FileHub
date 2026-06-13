@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { UserService } from '../../services/user.service';
-import {routes} from "../../app.routes";
+import { routes } from '../../app.routes';
 
 @Component({
   selector: 'app-login',
@@ -17,7 +17,7 @@ export class Login implements OnInit {
   email = '';
   password = '';
   errorMessage = '';
-  isLoading = false;
+  isLoading = false; // <- flag per sapere se il form è in caricamento
   csrfReady = false; // ← flag per sapere se CSRF è pronto
 
   constructor(
@@ -27,9 +27,7 @@ export class Login implements OnInit {
 
   ngOnInit(): void {
     this.userService.initializeCsrf().subscribe({
-      next: (response: any) => {
-        console.log('Token ricevuto:', response.token);
-        this.userService.setCsrfToken(response.token); // ← salva
+      next: () => {
         this.csrfReady = true;
       },
       error: (err) => console.error(err),
@@ -67,7 +65,7 @@ export class Login implements OnInit {
         this.router.navigate(['/home']);
       },
       error: (err) => {
-        console.error('❌ Login fallito:', err);
+        console.error('Login fallito:', err);
         this.errorMessage = 'Email o password non validi';
         this.isLoading = false;
       },

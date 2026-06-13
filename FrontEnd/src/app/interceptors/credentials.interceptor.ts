@@ -9,7 +9,6 @@ export class CredentialsInterceptor implements HttpInterceptor {
 
   intercept(req: HttpRequest<any>, next: HttpHandler) {
     const clonedReq = req.clone({ withCredentials: true });
-
     return next.handle(clonedReq).pipe(
       catchError((error: HttpErrorResponse) => {
         if (error.status === 401) {
