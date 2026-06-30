@@ -1,91 +1,50 @@
-<!-- src/app/components/login/login.component.html -->
-<div class="register-container">
-  <div class="card">
-    <h2>🔐 Register</h2>
-    @if (errorMessage){
-      <div class="alert-error"> {{ errorMessage }} </div>
-    }
-    <form #registerForm="ngForm" (ngSubmit)="onSubmit(registerForm)">
+<div class="p-4 max-w-sm mx-auto mt-10 border border-black bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+  <h2 class="text-xl font-bold mb-4 uppercase">Registrati</h2>
 
-      <div class="form-group">
-
-        <label for="email">Email</label>
-
-        <input type="email"
-               id="email"
-               name="email"
-               [(ngModel)]="email"
-               #emailInput="ngModel"
-               required
-               email>
+  <form (ngSubmit)="onSubmit()" class="flex flex-col gap-4">
 
 
-        @if (emailInput.invalid && emailInput.touched){
-          <div class="field-error"> {{ errorMessage }}
-            @if(emailInput.errors?.['required']){
-              <span>Email obbligatoria</span>
-            }
-            @if(emailInput.errors?.['email']){
-              <span>Email non valida</span>
-            }
-          </div>
-
-
-        }
-
-        <div class="form-group">
-          <label for="password">Password</label>
-          <input type="password"
-                 id="password"
-                 name="password"
-                 [(ngModel)]="password"
-                 #passwordInput="ngModel"
-                 required>
-          @if (passwordInput.invalid && passwordInput.touched){
-            <div class="field-error"> {{ errorMessage }}
-              <span>Password obbligatoria</span>
-            </div>
-          }
-        </div>
-        <div class="form-group">
-          <label for="name">Nome</label>
-          <input type="name"
-                 id="name"
-                 name="name"
-                 [(ngModel)]="name"
-                 #nameInput="ngModel"
-                 required>
-          @if (nameInput.invalid && nameInput.touched){
-            <div class="field-error"> {{ errorMessage }}
-              <span>Nome obbligatorio</span>
-            </div>
-          }
-        </div>
-        <div class="form-group">
-          <label for="surname">Cognome</label>
-          <input type="surname"
-                 id="surname"
-                 name="surname"
-                 [(ngModel)]="surname"
-                 #surnameInput="ngModel"
-                 required>
-          @if (surnameInput.invalid && surnameInput.touched){
-            <div class="field-error"> {{ errorMessage }}
-              <span>Cognome obbligatorio</span>
-            </div>
-          }
-        </div>
-
-
-
-        <button type="submit" [disabled]="registerForm.invalid || isLoading">
-          {{ isLoading ? 'Caricamento...' : 'Accedi' }}
-        </button>
+    <div class="flex gap-2">
+      <div class="flex flex-col w-1/2">
+        <label class="mb-1 font-bold">Nome</label>
+        <input type="text" name="name" [(ngModel)]="name" required class="border border-black p-2 focus:outline-none focus:bg-yellow-50">
       </div>
-    </form>
+      <div class="flex flex-col w-1/2">
+        <label class="mb-1 font-bold">Cognome</label>
+        <input type="text" name="surname" [(ngModel)]="surname" required class="border border-black p-2 focus:outline-none focus:bg-yellow-50">
+      </div>
+    </div>
 
-    <p class="register-link">
-      hai già un account? <a routerLink="/login">Login</a>
-    </p>
+
+    <div class="flex flex-col">
+      <label class="mb-1 font-bold">Email</label>
+      <input type="email" name="email" [(ngModel)]="email" required class="border border-black p-2 focus:outline-none focus:bg-yellow-50">
+    </div>
+
+
+    <div class="flex flex-col">
+      <label class="mb-1 font-bold">Password</label>
+      <input type="password" name="password" [(ngModel)]="password" required class="border border-black p-2 focus:outline-none focus:bg-yellow-50">
+    </div>
+
+
+    @if (errorMessage) {
+      <div class="bg-red-200 text-red-800 p-2 border border-red-800 font-bold">{{ errorMessage }}</div>
+    }
+    @if (successMessage) {
+      <div class="bg-green-200 text-green-800 p-2 border border-green-800 font-bold">{{ successMessage }}</div>
+    }
+
+    <!-- Bottone Submit -->
+    <button type="submit" class="bg-black text-white p-2 font-bold hover:bg-gray-800 cursor-pointer uppercase mt-2">
+      Crea Account
+    </button>
+  </form>
+
+  <!-- Link per tornare al Login -->
+  <div class="mt-4 text-center">
+    <a routerLink="/login" class="underline text-sm font-bold text-gray-600 hover:text-black cursor-pointer">
+      Hai già un account? Entra
+    </a>
   </div>
 </div>

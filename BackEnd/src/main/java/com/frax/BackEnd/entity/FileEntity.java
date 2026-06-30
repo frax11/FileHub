@@ -35,7 +35,7 @@ public class FileEntity {
 
     // Molti file → un utente (proprietario)
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "owner_id",nullable = false)
+    @JoinColumn(name = "owner_id")
     private UserEntity owner;  // chi ha caricato il file
 
 
@@ -44,7 +44,7 @@ public class FileEntity {
     private List<SharedFile> sharedWithUsers = new ArrayList<>();
 
     //attributi per condivisione
-    private boolean isShared;
+    private boolean isShared = false;
     private int maxAccessCount = 100;
     private int currentAccessCount = 0;
 

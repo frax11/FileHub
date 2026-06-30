@@ -1,9 +1,14 @@
 package com.frax.BackEnd.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.time.LocalDateTime;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class SharedFileDTO {
     private String shareId;
     private String fileId;

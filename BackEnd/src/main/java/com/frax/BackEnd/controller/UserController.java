@@ -12,7 +12,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,7 +28,7 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/login")
-    public ResponseEntity<?> logIn(@Valid @RequestBody UserLoginDTO loginDTO) {
+    public ResponseEntity<?> logIn(@Valid @RequestBody UserLoginDTO loginDTO,HttpServletRequest request, HttpServletResponse response) {
         try {
             // Autenticazione utente
             Authentication authentication = authenticationManager.authenticate(
@@ -34,6 +37,14 @@ public class UserController {
                     loginDTO.getPassword()
                 )
             );
+            SecurityContext context = SecurityContextHolder.createEmptyContext();
+            context.setAuthentication(authentication);
+            SecurityContextHolder.setContext(context);
+
+            HttpSessionSecurityContextRepository repository = new HttpSessionSecurityContextRepository();
+            repository.saveContext(context, request, response);
+
+
             return ResponseEntity.ok("Login effettuato");
         } catch (Exception e) {
             return ResponseEntity.status(401).body(
@@ -93,8 +104,4 @@ public class UserController {
         return ResponseEntity.ok(authentication.getPrincipal());
     }
 
-    @GetMapping("/csrf")
-    public CsrfToken getCsrf(CsrfToken token) {
-        return token;
-    }
 }

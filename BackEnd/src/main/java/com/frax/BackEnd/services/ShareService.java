@@ -18,7 +18,6 @@ import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
-@RequestMapping("/share")
 public class ShareService {
     private final FileRepo fileRepo;
     private final UserRepo userRepo;
@@ -31,6 +30,7 @@ public class ShareService {
                 .orElseThrow(() -> new RuntimeException("Utente non trovato: " + ownerEmail));
         FileEntity file = fileRepo.findById(request.getId())
                 .orElseThrow(() -> new RuntimeException("File non trovato"));
+
         if (!file.getOwner().getId().equals(owner.getId())) {
             throw new RuntimeException("Non sei il proprietario del file");
         }
@@ -38,18 +38,17 @@ public class ShareService {
         file.setMaxAccessCount(request.getMaxAccessCount());
         file.setCurrentAccessCount(0);
 
-        for (String email : request.getUserEmails()) {
 
-            UserEntity user = userRepo.findByEmail(email)
-                    .orElseThrow(() -> new RuntimeException("Utente non trovato: " + email));
+        UserEntity user = userRepo.findByEmail(request.getOwnerEmail())
+                .orElseThrow(() -> new RuntimeException("Utente non trovato: "+request.getOwnerEmail() ));
 
-            if (!sharedFileRepo.existsByFileIdAndSharedWith(file.getId(), user)) {
-                SharedFile sharedFile = new SharedFile();
-                sharedFile.setFile(file);
-                sharedFile.setSharedWith(user);
-                sharedFileRepo.save(sharedFile);
-            }
+        if (!sharedFileRepo.existsByFileIdAndSharedWith(file.getId(), user)) {
+            SharedFile sharedFile = new SharedFile();
+            sharedFile.setFile(file);
+            sharedFile.setSharedWith(user);
+            sharedFileRepo.save(sharedFile);
         }
+
         return ResponseEntity.ok().build();
 
     }
