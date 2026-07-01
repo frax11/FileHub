@@ -24,15 +24,11 @@ public class FileController {
 
     @GetMapping("/get/{id}")
     public ResponseEntity<?> getFile(@PathVariable String id, Authentication authentication) {
-
-
         try {
-            // Recupera i byte dal service
             byte[] fileBytes = fileService.downloadFile(id, authentication.getName());
 
             System.out.println("File letto! Dimensione: " + fileBytes.length + " bytes");
 
-            // FONDAMENTALE: Imposta gli Header corretti per dire al browser che è un file scaricabile!
             return ResponseEntity.ok()
                     .contentType(MediaType.APPLICATION_OCTET_STREAM)
                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; id=\"" + id + "\"")
@@ -40,7 +36,7 @@ public class FileController {
 
         } catch (Exception e) {
             System.err.println("errore durante il download file: " + e.getMessage());
-            return new ResponseEntity<>("Errore: " + e.getMessage(), HttpStatus.NOT_FOUND);
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
@@ -50,29 +46,27 @@ public class FileController {
             List<FileDTO> list = fileService.getAllFiles(authentication.getName());
             return new ResponseEntity<>(list,HttpStatus.OK);
         } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return ResponseEntity.notFound().build();
         }
 
     }
-    @PostMapping("/delete/{id}")
+    @DeleteMapping("/delete/{id}")
     public  ResponseEntity<?> deleteFile(@PathVariable String id,Authentication authentication) {
         try{
             fileService.deleteFile(id,authentication.getName());
-            return  new ResponseEntity<>(id+" è stato eliminato",HttpStatus.OK);
+            return ResponseEntity.ok().body("File deleted");
         } catch (IOException e) {
-            e.printStackTrace();
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return ResponseEntity.notFound().build();
         }
     }
     @PostMapping("/upload")
     public ResponseEntity<?> uploadFile(@RequestParam("file") MultipartFile file, Authentication authentication) {
         try {
             fileService.uploadFile(file, authentication);
-            return new ResponseEntity<>("File caricato", HttpStatus.OK);
+            return ResponseEntity.ok().body("File uploaded ");
         } catch (Exception e) {
             System.err.println("errore durante il upload file: " + e.getMessage());
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseEntity.internalServerError().build();
         }
     }
 

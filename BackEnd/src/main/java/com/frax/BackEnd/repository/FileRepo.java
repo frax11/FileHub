@@ -31,4 +31,6 @@ public interface FileRepo extends JpaRepository<FileEntity, String> {
     Optional<List<FileEntity>> findByOwner_Email(String ownerEmail);
 
     Optional<FileEntity> findFileById(String id);
+
+    Optional<List<FileEntity>>  findAllByOwner_Email(String ownerEmail);
 }

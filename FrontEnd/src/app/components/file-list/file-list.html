@@ -1,0 +1,71 @@
+<div class="card table-wrapper">
+  <table class="data-table">
+    <thead class="table-head">
+    <tr>
+      <th class="th-cell">Nome File</th>
+      <th class="th-cell">Proprietario</th>
+      <th class="th-cell">Size</th>
+      <th class="th-cell">Azioni</th>
+    </tr>
+    </thead>
+    <tbody>
+
+      @if (isLoading() && files().length === 0) {
+        <tr>
+          <td colspan="4" class="empty-state">Caricamento in corso...</td>
+        </tr>
+      } @else if (files().length === 0) {
+        <tr>
+          <td colspan="4" class="empty-state">Nessun file presente nel sistema.</td>
+        </tr>
+      }
+
+      @for (f of files(); track f.id) {
+        <tr class="tr-body">
+          <td class="td-cell file-name">{{ f.fileName }}</td>
+
+          <td class="td-cell">
+            {{ f.ownerEmail === currentUserEmail ? 'Tu' : f.ownerEmail }}
+            @if (f.ownerEmail !== currentUserEmail) {
+              <div class="badge-container">
+                  <span class="download-badge">
+                    Download rimasti: {{ f.maxAccessCount - f.currentAccessCount }}
+                  </span>
+              </div>
+            }
+          </td>
+
+          <td class="td-cell">{{ formatSize(f.fileSize) }} MB</td>
+
+          <td class="td-cell actions-cell">
+            @if (f.ownerEmail === currentUserEmail) {
+              <button (click)="onDownloadFile(f.id, f.fileName)" class="btn-action download">Scarica</button>
+              <button (click)="sharingFileId.set(f.id)" class="btn-action share">Condividi</button>
+              <button (click)="onDeleteFile(f.id)" class="btn-action delete">Elimina</button>
+            } @else {
+              <button (click)="onSharedDownloadFile(f.id, f.fileName)" class="btn-action download">Scarica</button>
+              <button (click)="onRevokeAccess(f.id)" class="btn-action delete">Elimina</button>
+            }
+          </td>
+        </tr>
+
+        @if (sharingFileId() === f.id) {
+          <tr class="share-row">
+            <td colspan="4" class="share-cell">
+              <div class="share-form">
+                <label class="form-label">Condividi con:</label>
+                <input type="email" [(ngModel)]="shareEmailTarget" placeholder="esempio@gmail.com" class="form-input email">
+
+                <label class="form-label limit-label" title="Numero massimo di download consentiti">Limite:</label>
+                <input type="number" [(ngModel)]="shareLimit" min="1" max="100" placeholder="100 massimo - 1 minimo" class="form-input number">
+
+                <button (click)="onShareFile(f.id, shareLimit())" class="btn-dark">INVIA</button>
+                <button (click)="sharingFileId.set(null)" class="btn-cancel">Annulla</button>
+              </div>
+            </td>
+          </tr>
+        }
+      }
+    </tbody>
+  </table>
+</div>

@@ -1,79 +1,28 @@
-<div class="p-4 max-w-5xl mx-auto mt-6">
+<div class="dashboard-container">
 
   <!-- Intestazione -->
-  <div class="flex justify-between items-center mb-6 p-4 border border-black bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+  <div class="card header-card">
     <div>
-      <h1 class="text-2xl font-black uppercase">FileHub Dashboard</h1>
-      <p class="text-sm font-bold mt-1">Utente: <span class="bg-yellow-200 px-1">{{ currentUserEmail }}</span></p>
+      <h1 class="title">FileHub Dashboard</h1>
+      <p class="subtitle">Utente: <span class="user-badge">{{ currentUserEmail }}</span></p>
     </div>
-    <button (click)="onLogout()" class="bg-red-500 text-white px-4 py-2 font-bold border border-black hover:bg-red-600 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-y-1 active:shadow-none transition-all">
-      ESCI
-    </button>
+    <div class="header-actions">
+      <!-- Pulsante Profilo con navigazione nativa Angular -->
+      <button routerLink="/profile" class="btn-dark">
+        PROFILO
+      </button>
+      <button (click)="onLogout()" class="btn-danger">
+        ESCI
+      </button>
+    </div>
   </div>
 
-  <!-- Zona Upload -->
-  <div class="mb-6 p-4 border border-black bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-    <h2 class="font-bold uppercase mb-2">Carica nuovo file</h2>
-    <input type="file"
-           (change)="onUploadFile($event)"
-           [disabled]="isLoading()"
-           class="border border-black p-2 cursor-pointer w-full bg-gray-50 file:mr-4 file:py-2 file:px-4 file:border-0 file:text-sm file:font-bold file:bg-black file:text-white hover:file:bg-gray-800 disabled:opacity-50">
-  </div>
+  <!-- COMPONENTE UPLOAD -->
+  <!-- Ascoltiamo l'evento uploadSuccess per dire alla tabella di ricaricarsi -->
+  <app-upload (uploadSuccess)="fileList.loadData()"></app-upload>
 
-  <!-- Tabella File -->
-  <div class="border border-black bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
-    <table class="w-full text-left border-collapse">
-      <thead class="bg-black text-white">
-      <tr>
-        <th class="p-3 border-r border-b border-black font-bold uppercase">Nome File</th>
-        <th class="p-3 border-r border-b border-black font-bold uppercase">Proprietario</th>
-        <th class="p-3 border-r border-b border-black font-bold uppercase">Size</th>
-        <th class="p-3 border-b border-black font-bold uppercase">Azioni</th>
-      </tr>
-      </thead>
-      <tbody>
+  <!-- COMPONENTE LISTA FILE -->
+  <!-- Usiamo #fileList per creare un riferimento locale al componente -->
+  <app-file-list #fileList></app-file-list>
 
-        @if (isLoading() && files().length === 0) {
-          <tr>
-            <td colspan="4" class="p-6 text-center font-bold">Caricamento in corso...</td>
-          </tr>
-        } @else if (files().length === 0) {
-          <tr>
-            <td colspan="4" class="p-6 text-center font-bold">Nessun file presente nel sistema.</td>
-          </tr>
-        }
-
-        @for (f of files(); track f.id) {
-          <tr class="hover:bg-gray-100">
-            <td class="p-3 border-r border-b border-black font-semibold">{{ f.fileName }}</td>
-            <td class="p-3 border-r border-b border-black">{{ f.ownerEmail }}</td>
-            <td class="p-3 border-r border-b border-black">{{ formatSize(f.fileSize) }} MB</td>
-            <td class="p-3 border-b border-black space-x-3">
-              <button (click)="onDownloadFile(f.id, f.fileName)" class="underline font-bold text-blue-700 hover:text-blue-900">Scarica</button>
-
-              <!-- Azioni visibili solo se il file è tuo -->
-              @if (f.ownerEmail === currentUserEmail) {
-                <button (click)="sharingFileId.set(f.id)" class="underline font-bold text-green-700 hover:text-green-900">Condividi</button>
-                <button (click)="onDeleteFile(f.id)" class="underline font-bold text-red-700 hover:text-red-900">Elimina</button>
-              }
-            </td>
-          </tr>
-
-          <!-- Riga Condivisione che si apre sotto al file selezionato -->
-          @if (sharingFileId() === f.id) {
-            <tr class="bg-green-100">
-              <td colspan="4" class="p-3 border-b border-black">
-                <div class="flex items-center gap-2">
-                  <label class="font-bold uppercase text-sm">Condividi con:</label>
-                  <input type="email" [(ngModel)]="shareEmailTarget" placeholder="Email utente" class="border border-black p-1 px-2 focus:outline-none focus:bg-white flex-1 max-w-xs">
-                  <button (click)="onShareFile(f.id)" class="bg-black text-white px-3 py-1 font-bold border border-black hover:bg-gray-800">INVIA</button>
-                  <button (click)="sharingFileId.set(null)" class="underline text-sm ml-2 font-bold">Annulla</button>
-                </div>
-              </td>
-            </tr>
-          }
-        }
-      </tbody>
-    </table>
-  </div>
 </div>

@@ -1,7 +1,7 @@
 import { Component, signal, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet, Router } from '@angular/router';
-import { Api } from './services/api';
+import { AuthService } from './services/auth-service';
 
 @Component({
   selector: 'app-root',
@@ -18,7 +18,7 @@ import { Api } from './services/api';
   `,
 })
 export class App implements OnInit {
-  private api = inject(Api);
+  private api = inject(AuthService);
   private router = inject(Router);
 
   isCheckingSession = signal<boolean>(true);

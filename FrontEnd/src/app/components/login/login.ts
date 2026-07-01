@@ -1,8 +1,9 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Api } from '../../services/api';
 import { Router, RouterLink } from '@angular/router';
+import { AuthService } from '../../services/auth-service';
+import { LoginUserDto } from '../../models/login-user-dto';
 
 @Component({
   selector: 'app-login',
@@ -11,7 +12,7 @@ import { Router, RouterLink } from '@angular/router';
   templateUrl: './login.html',
 })
 export class Login {
-  private api = inject(Api);
+  private api = inject(AuthService);
   private router = inject(Router);
 
   email = '';
@@ -20,7 +21,11 @@ export class Login {
 
   async onSubmit() {
     this.errorMessage = '';
-    const success = await this.api.login(this.email, this.password);
+    const userLogin : LoginUserDto={
+      email:this.email,
+      password:this.password
+    };
+    const success = await this.api.login(userLogin);
 
     if (success) {
       this.router.navigate(['/home']);

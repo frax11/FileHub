@@ -1,0 +1,66 @@
+<div class="profile-container">
+
+  <!-- Intestazione Profilo -->
+  <div class="card header-card">
+    <div>
+      <h1 class="title">Impostazioni Profilo</h1>
+      <p class="subtitle">Utente: <span class="user-badge">{{ currentUserEmail }}</span></p>
+      <p class="subtitle">Nome: <span class="user-badge">{{ currentUserName }}</span></p>
+      <p class="subtitle">Cognome: <span class="user-badge">{{ currentUserSurname }}</span></p>
+    </div>
+    <div class="header-actions">
+      <!-- Pulsante per tornare indietro (usa routerLink) -->
+      <button routerLink="/home" class="btn-dark">
+        TORNA ALLA HOME
+      </button>
+    </div>
+  </div>
+
+  <!-- Form Modifica Dati -->
+  <div class="card form-card">
+    <h2 class="section-title">Modifica Dati</h2>
+
+    <form class="profile-form">
+      <div class="form-group">
+        <label class="form-label">Nuovo Nome (Opzionale)</label>
+        <input type="text" [(ngModel)]="updateName" name="updateName" class="form-input">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Nuovo Cognome (Opzionale)</label>
+        <input type="text" [(ngModel)]="updateSurname" name="updateSurname" class="form-input">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Nuova Password (Opzionale)</label>
+        <input type="password" [(ngModel)]="updatePassword" name="updatePassword" minlength="6" #updatePasswordInput="ngModel" placeholder="Lascia vuoto per non cambiare" class="form-input">
+        @if (updatePasswordInput.invalid && (updatePasswordInput.dirty || updatePasswordInput.touched)) {
+          <span class="text-red-600 text-xs font-bold mt-1">La password deve contenere almeno 6 caratteri.</span>
+        }
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Password Corrente *</label>
+        <input type="password" [(ngModel)]="currentPassword" name="currentPassword" minlength="6" #currentPasswordInput="ngModel"placeholder="" class="form-input">
+        @if (currentPasswordInput.invalid && (currentPasswordInput.dirty || currentPasswordInput.touched)) {
+          <span class="text-red-600 text-xs font-bold mt-1">La password deve contenere almeno 6 caratteri.</span>
+        }
+      </div>
+
+      <button type="button" (click)="onUpdateProfile()" [disabled]="isLoading()" class="btn-warning mt-4">
+        AGGIORNA INFORMAZIONI
+      </button>
+    </form>
+  </div>
+
+  <!-- Zona Pericolosa -->
+  <div class="card danger-card">
+    <h2 class="section-title text-red-600">Zona Pericolosa</h2>
+    <p class="danger-text">L'eliminazione dell'account rimuoverà permanentemente tutti i tuoi file dal server.</p>
+
+    <button type="button" (click)="onDeleteAccount()" [disabled]="isLoading()" class="btn-danger-outline mt-4">
+      ELIMINA DEFINITIVAMENTE ACCOUNT
+    </button>
+  </div>
+
+</div>

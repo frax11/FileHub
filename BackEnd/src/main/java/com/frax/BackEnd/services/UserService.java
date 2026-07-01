@@ -1,7 +1,12 @@
 package com.frax.BackEnd.services;
 
+import java.io.IOException;
+import java.util.Objects;
 import java.util.Optional;
 
+import com.frax.BackEnd.dto.UserInfoDTO;
+import com.frax.BackEnd.dto.UserUpdateDTO;
+import com.frax.BackEnd.repository.FileRepo;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -24,6 +29,8 @@ public class UserService implements UserDetailsService {
     private final UserRepo userRepo;
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
+    private final FileRepo fileRepo;
+    private final FileService fileService;
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
@@ -52,14 +59,40 @@ public class UserService implements UserDetailsService {
         userEntity.setIsEnabled(true);
         userEntity.setIsAdmin(false);
         userRepo.save(userEntity);
-        return userMapper.toDTO(userEntity);
+        return userMapper.toUserDTO(userEntity);
     }
-
-    public void deleteUser(String email) {
-        if(userRepo.existsByEmail(email))
+    @Transactional
+    public void deleteUser(String email) throws IOException {
+        if(userRepo.existsByEmail(email)) {
+            fileService.deleteAllFile(email);
             userRepo.deleteByEmail(email);
-        else
+        } else{
             throw new UsernameNotFoundException("User not found");
+        }
+    }
+    @Transactional
+    public void updateUser(UserUpdateDTO userUpdateDTO, String email) {
+        UserEntity user = userRepo.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Utente non trovato"));
+        if (passwordEncoder.matches(userUpdateDTO.getCurrentPassword(), user.getPassword())) {
+            if (userUpdateDTO.getName() != null && !userUpdateDTO.getName().isBlank()) {
+                user.setName(userUpdateDTO.getName().toUpperCase());
+            }
+            if (userUpdateDTO.getSurname() != null && !userUpdateDTO.getSurname().isBlank()) {
+                user.setSurname(userUpdateDTO.getSurname().toUpperCase());
+            }
+            if (userUpdateDTO.getUpdatePassword() != null && !userUpdateDTO.getUpdatePassword().isBlank()) {
+                user.setPassword(passwordEncoder.encode(userUpdateDTO.getUpdatePassword()));
+            }
+            userRepo.save(user);
+        }else {
+            throw new SecurityException("Password Errata");
+        }
+
     }
 
+    public UserInfoDTO getUser(String  email) {
+        return userMapper.toInfoDTO(userRepo.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Utente non trovato")));
+    }
 }

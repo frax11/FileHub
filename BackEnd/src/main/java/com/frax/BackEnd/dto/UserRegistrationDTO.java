@@ -14,9 +14,6 @@ import lombok.NoArgsConstructor;
 @Data
 public class UserRegistrationDTO {
 
-    @NotBlank(message = "Name è obbligatoria")
-    private String name;
-
     @NotBlank(message = "Surname è obbligatoria")
     private String surname;
 
@@ -30,6 +27,9 @@ public class UserRegistrationDTO {
 
     @Nullable
     private Boolean isAdmin;
+    @NotBlank(message = "Name è obbligatoria")
+    private String name;
+
 
     
 

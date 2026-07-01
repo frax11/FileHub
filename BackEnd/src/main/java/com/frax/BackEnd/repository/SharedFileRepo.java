@@ -1,5 +1,6 @@
 package com.frax.BackEnd.repository;
 
+import com.frax.BackEnd.entity.FileEntity;
 import com.frax.BackEnd.entity.SharedFile;
 import com.frax.BackEnd.entity.UserEntity;
 import jakarta.transaction.Transactional;
@@ -36,4 +37,10 @@ public interface SharedFileRepo extends JpaRepository<SharedFile, Long> {
 
 
     Optional<List<SharedFile>> findBySharedWith_Email(String sharedWith);
+
+    @Modifying
+    @Transactional
+    void deleteByFile(FileEntity file);
+
+    Optional<SharedFile> findByFile_IdAndSharedWith_Email(String id, String sharedWith_email);
 }

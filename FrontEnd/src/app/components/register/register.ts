@@ -2,7 +2,8 @@ import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { Api } from '../../services/api';
+import { AuthService } from '../../services/auth-service';
+import { RegisterUserDto } from '../../models/register-user-dto';
 
 @Component({
   selector: 'app-register',
@@ -11,7 +12,7 @@ import { Api } from '../../services/api';
   templateUrl: './register.html',
 })
 export class Register {
-  private api = inject(Api);
+  private api = inject(AuthService);
   private router = inject(Router);
 
   email = '';
@@ -26,8 +27,14 @@ export class Register {
     this.errorMessage = '';
     this.successMessage = '';
 
-    // Chiama il backend per creare l'account
-    const success = await this.api.register(this.email, this.name, this.surname, this.password);
+    const userRegister:RegisterUserDto ={
+        name:this.name,
+        surname:this.surname,
+        email:this.email,
+        password:this.password,
+    };
+
+    const success = await this.api.register(userRegister);
 
     if (success) {
       this.successMessage = 'Registrazione completata! Puoi fare login.';
@@ -35,7 +42,7 @@ export class Register {
         this.router.navigate(['/login']);
       }, 2000);
     } else {
-      this.errorMessage = 'Errore durante la registrazione. Controlla i dati o riprova.';
+      this.errorMessage = 'Errore durante la registrazione. Utente gia registrato / controlla i dati e riprova. ';
     }
   }
 }

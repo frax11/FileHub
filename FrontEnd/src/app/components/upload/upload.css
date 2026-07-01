@@ -1,0 +1,21 @@
+@reference "tailwindcss";
+
+.card {
+  @apply border border-black bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] mb-6;
+}
+
+.upload-card {
+  @apply p-4;
+}
+
+.section-title {
+  @apply font-bold uppercase mb-2;
+}
+
+.file-input {
+  @apply border border-black p-2 cursor-pointer w-full bg-gray-50 disabled:opacity-50;
+}
+
+.file-input::file-selector-button {
+  @apply mr-4 py-2 px-4 border-0 text-sm font-bold bg-black text-white hover:bg-gray-800 cursor-pointer;
+}

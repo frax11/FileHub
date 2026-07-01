@@ -16,6 +16,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.*;
@@ -116,7 +117,23 @@ public class FileService {
         return Files.readAllBytes(filePath);
     }
 
+    @Transactional
+    public void deleteAllFile(String email) throws IOException {
+        List<FileEntity> fileList = fileRepo.findByOwnerEmail(email)
+                .orElseThrow(() -> new FileNotFoundException("File non trovato nel database"));
+        for(FileEntity file : fileList){
+            Path path = Path.of(file.getFilePath());
+            if(Files.deleteIfExists(path))
+            {
+                fileRepo.delete(file);
+            }else {
+                throw new IOException("File non trovato nel database");
+            }
+        }
 
 
+
+    }
 
 }
+

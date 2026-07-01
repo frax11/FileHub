@@ -30,7 +30,7 @@ public class SecurityConfig {
                         auth
                                 .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
 
-                                .requestMatchers("/user/**", "/error", "/api/error").permitAll()
+                                .requestMatchers("/user/register","/user/login", "/error", "/api/error").permitAll()
 
                                 .anyRequest()
                                 .authenticated()

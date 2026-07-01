@@ -1,0 +1,36 @@
+@reference "tailwindcss";
+
+.card {
+  @apply border border-black bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)];
+}
+
+.table-wrapper { @apply overflow-hidden; }
+.data-table { @apply w-full text-left border-collapse; }
+.table-head { @apply bg-black text-white; }
+.th-cell { @apply p-3 border-b border-black font-bold uppercase; }
+.th-cell:not(:last-child) { @apply border-r; }
+.tr-body { @apply hover:bg-gray-100; }
+.td-cell { @apply p-3 border-b border-black; }
+.td-cell:not(:last-child) { @apply border-r; }
+.file-name { @apply font-semibold; }
+
+.badge-container { @apply mt-1; }
+.download-badge { @apply inline-block bg-red-100 text-red-800 border border-red-800 text-xs px-2 py-1 font-bold mt-1; }
+
+.actions-cell { @apply space-x-3; }
+.btn-action { @apply underline font-bold cursor-pointer; }
+.btn-action.download { @apply text-blue-700 hover:text-blue-900; }
+.btn-action.share { @apply text-green-700 hover:text-green-900; }
+.btn-action.delete { @apply text-red-700 hover:text-red-900; }
+
+.share-row { @apply bg-green-100; }
+.share-cell { @apply p-3 border-b border-black; }
+.share-form { @apply flex items-center gap-2; }
+.form-label { @apply font-bold uppercase text-sm; }
+.limit-label { @apply ml-2; }
+.form-input { @apply border border-black p-2 focus:outline-none focus:bg-white; }
+.form-input.email { @apply flex-1 max-w-xs; }
+.form-input.number { @apply w-20; }
+.btn-dark { @apply bg-black text-white px-3 py-2 font-bold border border-black hover:bg-gray-800 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-y-1 active:shadow-none transition-all cursor-pointer; }
+.btn-cancel { @apply underline text-sm ml-2 font-bold cursor-pointer; }
+.empty-state { @apply p-6 text-center font-bold; }

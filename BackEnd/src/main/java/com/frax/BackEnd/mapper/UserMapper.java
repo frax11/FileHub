@@ -1,5 +1,7 @@
 package com.frax.BackEnd.mapper;
 
+import com.frax.BackEnd.dto.UserInfoDTO;
+import com.frax.BackEnd.dto.UserLoginDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import com.frax.BackEnd.dto.UserDTO;
@@ -15,8 +17,9 @@ public interface UserMapper {
     @Mapping(target = "createdAt", ignore = true)
     UserEntity toEntity(UserRegistrationDTO registrationDTO);
 
-    UserDTO toDTO(UserEntity userEntity);
+    UserDTO toUserDTO(UserEntity userEntity);
 
+    UserInfoDTO toInfoDTO(UserEntity userEntity);
 
     
 }

@@ -1,6 +1,5 @@
 package com.frax.BackEnd.services;
 
-import com.frax.BackEnd.dto.SharedFileDTO;
 import com.frax.BackEnd.dto.SharedRequestDTO;
 import com.frax.BackEnd.entity.FileEntity;
 import com.frax.BackEnd.entity.SharedFile;
@@ -12,9 +11,10 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestMapping;
 
-import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 @RequiredArgsConstructor
@@ -26,6 +26,7 @@ public class ShareService {
     @Transactional
     public ResponseEntity<?> shareFileWithUsers(SharedRequestDTO request, String ownerEmail) {
 
+        String shareEmail =  request.getShareTo().toUpperCase();
         UserEntity owner = userRepo.findByEmail(ownerEmail)
                 .orElseThrow(() -> new RuntimeException("Utente non trovato: " + ownerEmail));
         FileEntity file = fileRepo.findById(request.getId())
@@ -37,10 +38,11 @@ public class ShareService {
         file.setShared(true);
         file.setMaxAccessCount(request.getMaxAccessCount());
         file.setCurrentAccessCount(0);
+        fileRepo.save(file);
 
 
-        UserEntity user = userRepo.findByEmail(request.getOwnerEmail())
-                .orElseThrow(() -> new RuntimeException("Utente non trovato: "+request.getOwnerEmail() ));
+        UserEntity user = userRepo.findByEmail(shareEmail)
+                .orElseThrow(() -> new RuntimeException("Utente non trovato: " + shareEmail));
 
         if (!sharedFileRepo.existsByFileIdAndSharedWith(file.getId(), user)) {
             SharedFile sharedFile = new SharedFile();
@@ -54,7 +56,7 @@ public class ShareService {
     }
 
     @Transactional
-    public FileEntity accessSharedFile(String fileId, String userEmail) {
+    public FileEntity getSharedFile(String fileId, String userEmail) {
         UserEntity user = userRepo.findByEmail(userEmail)
                 .orElseThrow(() -> new RuntimeException("Utente non trovato: " + userEmail));
 
@@ -80,7 +82,44 @@ public class ShareService {
             throw new RuntimeException("Impossibile accedere: limite raggiunto");
         }
 
-        return fileRepo.findById(fileId).orElseThrow();
+        return fileRepo.findById(fileId).orElseThrow(() -> new RuntimeException("File non trovato: " + file.getFileName()));
+    }
+
+    @Transactional
+    public ResponseEntity<?> checkAll(String userEmail) {
+        AtomicInteger count = new AtomicInteger();
+        List<FileEntity> userFiles = new ArrayList<>();
+
+        List<SharedFile> sharedFilesList = sharedFileRepo.findBySharedWith_Email(userEmail)
+                .orElse(List.of());
+
+        sharedFilesList.forEach(sharedFile -> {
+            FileEntity file=  fileRepo.findFileById(sharedFile.getFile().getId()).orElseThrow(() -> new RuntimeException("File non trovato"));
+            if (file.isShared() && file.getCurrentAccessCount() >= file.getMaxAccessCount()) {
+                sharedFileRepo.deleteByFile(file);
+                file.setShared(false);
+                file.setCurrentAccessCount(0);
+                fileRepo.save(file);
+                count.getAndIncrement();
+            } else{
+                userFiles.add(file);
+            }
+        });
+
+        for (FileEntity f : userFiles) {
+            System.out.println(f.getFileName());
+            System.out.println(f.getMaxAccessCount());
+            System.out.println(f.getCurrentAccessCount());
+        }
+        return ResponseEntity.ok("Pulizia completata. Sono stati revocati gli accessi a " + count.get() + " file esauriti.");
+    }
+
+    @Transactional
+    public void revokeAccess(String fileId, String email) {
+        SharedFile sharedFile = sharedFileRepo.findByFile_IdAndSharedWith_Email(fileId, email)
+                .orElseThrow(() -> new RuntimeException("Nessuna condivisione trovata per questo file"));
+
+        sharedFileRepo.delete(sharedFile);
     }
 }
 

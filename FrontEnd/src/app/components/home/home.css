@@ -1,0 +1,37 @@
+@reference "tailwindcss";
+
+.dashboard-container {
+  @apply p-4 max-w-5xl mx-auto mt-6;
+}
+
+.card {
+  @apply border border-black bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] mb-6;
+}
+
+.header-card {
+  @apply flex justify-between items-center p-4;
+}
+
+.title {
+  @apply text-2xl font-black uppercase;
+}
+
+.subtitle {
+  @apply text-sm font-bold mt-1;
+}
+
+.user-badge {
+  @apply bg-yellow-200 px-1 font-bold;
+}
+
+.header-actions {
+  @apply flex gap-4;
+}
+
+.btn-dark {
+  @apply bg-black text-white px-3 py-2 font-bold border border-black hover:bg-gray-800 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-y-1 active:shadow-none transition-all cursor-pointer;
+}
+
+.btn-danger {
+  @apply bg-red-500 text-white px-4 py-2 font-bold border border-black hover:bg-red-600 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-y-1 active:shadow-none transition-all cursor-pointer;
+}

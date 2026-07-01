@@ -1,0 +1,73 @@
+@reference "tailwindcss";
+
+.profile-container {
+  @apply p-4 max-w-3xl mx-auto mt-6;
+}
+
+.card {
+  @apply border border-black bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] mb-6;
+}
+
+.header-card {
+  @apply flex justify-between items-center p-4;
+}
+
+.title {
+  @apply text-2xl font-black uppercase;
+}
+
+.subtitle {
+  @apply text-sm font-bold mt-1;
+}
+
+.user-badge {
+  @apply bg-yellow-200 px-1;
+}
+
+.header-actions {
+  @apply flex gap-4;
+}
+
+.btn-dark {
+  @apply bg-black text-white px-3 py-2 font-bold border border-black hover:bg-gray-800 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-y-1 active:shadow-none transition-all cursor-pointer;
+}
+
+.form-card, .danger-card {
+  @apply p-6;
+}
+
+.section-title {
+  @apply font-bold uppercase mb-4 text-lg border-b border-gray-300 pb-2;
+}
+
+.profile-form {
+  @apply flex flex-col gap-4;
+}
+
+.form-group {
+  @apply flex flex-col;
+}
+
+.form-label {
+  @apply font-bold uppercase text-sm mb-1;
+}
+
+.form-input {
+  @apply border border-black p-2 focus:outline-none focus:bg-yellow-50 w-full;
+}
+
+.mt-4 {
+  @apply mt-4;
+}
+
+.btn-warning {
+  @apply bg-yellow-300 text-black border border-black font-bold p-3 hover:bg-yellow-400 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] uppercase w-full active:translate-y-1 active:shadow-none transition-all cursor-pointer disabled:opacity-50;
+}
+
+.danger-text {
+  @apply font-semibold text-sm mb-2;
+}
+
+.btn-danger-outline {
+  @apply w-full bg-red-100 text-red-800 border border-red-800 font-bold p-3 hover:bg-red-200 uppercase flex justify-center active:translate-y-1 transition-all cursor-pointer disabled:opacity-50;
+}

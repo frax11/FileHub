@@ -1,0 +1,7 @@
+<div class="card upload-card">
+  <h2 class="section-title">Carica nuovo file</h2>
+  <input type="file"
+         (change)="onUploadFile($event)"
+         [disabled]="isLoading()"
+         class="file-input">
+</div>

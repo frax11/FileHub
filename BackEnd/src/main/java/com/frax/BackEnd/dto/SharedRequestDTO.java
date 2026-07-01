@@ -22,5 +22,5 @@ public class SharedRequestDTO {
     private int maxAccessCount = 100;
 
     @NotNull(message = "utente deve essere specificato")
-    private String ownerEmail;
+    private String shareTo;
 }
