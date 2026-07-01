@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, inject } from '@angular/core';
+import { Component, OnInit, signal, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth-service';
@@ -22,6 +22,24 @@ export class FileList implements OnInit {
   sharingFileId = signal<string | null>(null);
   shareEmailTarget = signal<string>('');
   shareLimit = signal<number>(100);
+  searchQuery = signal<string>('');
+  filteredFiles = computed(() => {
+    const query = this.searchQuery();
+    if (!query) return this.files();
+    try {
+      const regex = new RegExp(query, 'i');
+      return this.files().filter(
+        (f) => regex.test(f.fileName) || regex.test(f.ownerEmail)
+      );
+    }catch (e) {
+      const lowerQuery = query.toLowerCase();
+      return this.files().filter(
+        (f) =>
+          f.fileName.toLowerCase().includes(lowerQuery) ||
+          f.ownerEmail.toLowerCase().includes(lowerQuery),
+      );
+    }
+  });
 
   get currentUserEmail() {
     return this.authService.currentUserEmail();
@@ -48,7 +66,7 @@ export class FileList implements OnInit {
       await this.fileService.downloadFile(fileId, fileName);
     } catch (error) {
       alert('Errore download.');
-    }finally {
+    } finally {
       await this.loadData();
     }
   }
@@ -56,9 +74,9 @@ export class FileList implements OnInit {
   async onSharedDownloadFile(fileId: string, fileName: string) {
     try {
       await this.fileService.downloadSharedFile(fileId, fileName);
-    }catch(error) {
+    } catch (error) {
       alert('Errore download.');
-    }finally {
+    } finally {
       await this.loadData();
     }
   }
@@ -68,7 +86,7 @@ export class FileList implements OnInit {
     var success;
     try {
       success = await this.fileService.deleteFile(fileId);
-    }catch(error) {
+    } catch (error) {
       alert('Errore eliminzaione.');
     }
     if (success) {
@@ -95,12 +113,12 @@ export class FileList implements OnInit {
     }
   }
 
-  async onRevokeAccess(id:string){
+  async onRevokeAccess(id: string) {
     if (!confirm('Eliminare file?')) return;
     var success;
     try {
       success = await this.fileService.revokeMyAccess(id);
-    }catch(error) {
+    } catch (error) {
       alert('Errore eliminzaione.');
     }
     if (success) {
@@ -110,7 +128,6 @@ export class FileList implements OnInit {
       await this.loadData();
     }
   }
-
 
   formatSize(bytes: number): string {
     return (bytes / 1024 / 1024).toFixed(2);
