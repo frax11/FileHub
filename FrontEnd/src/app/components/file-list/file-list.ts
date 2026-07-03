@@ -28,10 +28,8 @@ export class FileList implements OnInit {
     if (!query) return this.files();
     try {
       const regex = new RegExp(query, 'i');
-      return this.files().filter(
-        (f) => regex.test(f.fileName) || regex.test(f.ownerEmail)
-      );
-    }catch (e) {
+      return this.files().filter((f) => regex.test(f.fileName) || regex.test(f.ownerEmail));
+    } catch (e) {
       const lowerQuery = query.toLowerCase();
       return this.files().filter(
         (f) =>
@@ -71,9 +69,9 @@ export class FileList implements OnInit {
     }
   }
 
-  async onSharedDownloadFile(fileId: string, fileName: string) {
+  async viewSharedFile(fileId: string, fileName: string) {
     try {
-      await this.fileService.downloadSharedFile(fileId, fileName);
+      await this.fileService.viewSharedFile(fileId, fileName);
     } catch (error) {
       alert('Errore download.');
     } finally {
@@ -127,6 +125,13 @@ export class FileList implements OnInit {
       alert('Errore eliminazione.');
       await this.loadData();
     }
+  }
+
+  isSharable(fileName: string): boolean {
+    if (!fileName) return false;
+    const ext = fileName.split('.').pop()?.toLowerCase();
+    const allowedExtensions = ['pdf', 'png', 'jpg', 'jpeg', 'txt', 'mp4'];
+    return allowedExtensions.includes(ext || '');
   }
 
   formatSize(bytes: number): string {

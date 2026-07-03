@@ -74,21 +74,27 @@ export class FileService {
     });
     return res.ok;
   }
-  async downloadSharedFile(fileId: string, fileName: string): Promise<void> {
+  async viewSharedFile(fileId: string, fileName: string): Promise<void> {
     const res = await this.auth.customFetch(`${this.apiUrl}/shared/get/${fileId}`, {
       credentials: 'include',
     });
-    if (!res.ok) throw new Error('Errore download');
-
+    if (!res.ok) throw new Error('Errore caricamento file');
     const blob = await res.blob();
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = fileName; // Diamo al file il suo nome originale
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    window.URL.revokeObjectURL(url);
+    let ext = 'application/pdf';
+    const filename = fileName.toLowerCase();
+
+    if (filename.endsWith('.png')) ext = 'image/png';
+    else if (filename.endsWith('.jpg') || filename.endsWith('.jpeg')) ext = 'image/jpeg';
+    else if (filename.endsWith('.txt')) ext = 'text/plain';
+    else if (filename.endsWith('.mp4')) ext = 'video/mp4';
+
+    const fileBlob = new Blob([blob], { type: ext });
+
+    const url = window.URL.createObjectURL(fileBlob);
+    window.open(url, '_blank');
+
+    setTimeout(() => window.URL.revokeObjectURL(url), 1000);
+
   }
   async revokeMyAccess(fileId: string): Promise<boolean> {
     const res = await this.auth.customFetch(`${this.apiUrl}/shared/revoke/${fileId}`, {

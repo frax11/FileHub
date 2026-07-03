@@ -50,10 +50,14 @@
           <td class="td-cell actions-cell">
             @if (f.ownerEmail === currentUserEmail) {
               <button (click)="onDownloadFile(f.id, f.fileName)" class="btn-action download">Scarica</button>
+            @if(isSharable(f.fileName)){
               <button (click)="sharingFileId.set(f.id)" class="btn-action share">Condividi</button>
+            }@else{
+              <button class="btn-action disable">Condividi </button>
+              }
               <button (click)="onDeleteFile(f.id)" class="btn-action delete">Elimina</button>
             } @else {
-              <button (click)="onSharedDownloadFile(f.id, f.fileName)" class="btn-action download">Scarica</button>
+              <button (click)="viewSharedFile(f.id, f.fileName)" class="btn-action download">Vedi</button>
               <button (click)="onRevokeAccess(f.id)" class="btn-action delete">Elimina</button>
             }
           </td>

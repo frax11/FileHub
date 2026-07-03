@@ -36,7 +36,6 @@ public class FileService {
     @Transactional
     public void uploadFile(MultipartFile file, Authentication authentication) throws IOException {
 
-        // Crea directory se non esiste
 
         String UPLOAD_DIR = "uploads/";
         Path path = Path.of(UPLOAD_DIR);
@@ -44,7 +43,6 @@ public class FileService {
             Files.createDirectories(path);
         } catch (FileAlreadyExistsException ignore) {}
 
-        // Recupera l'estensione del file
         String originalName = file.getOriginalFilename();
         if (originalName == null || !originalName.contains(".")) {
             throw new IOException("Formato del file invalido");
@@ -66,15 +64,12 @@ public class FileService {
         String uniqueFileName = fileEntity.getId() + extension;
         Path finalPath = Path.of(UPLOAD_DIR, uniqueFileName);
 
-        //Aggiornamento percorso completo
         fileEntity.setFilePath(finalPath.toString());
         fileRepo.save(fileEntity);
 
-        // Salvataggio fisico
         Files.copy(file.getInputStream(), finalPath, StandardCopyOption.REPLACE_EXISTING);
     }
 
-    //Prende le informazioni dei file
     @Transactional
     public List<FileDTO> getAllFiles(String ownerEmail) throws FileNotFoundException {
         List<FileDTO> fileDTOList = new ArrayList<>();
@@ -123,12 +118,9 @@ public class FileService {
                 .orElseThrow(() -> new FileNotFoundException("File non trovato nel database"));
         for(FileEntity file : fileList){
             Path path = Path.of(file.getFilePath());
-            if(Files.deleteIfExists(path))
-            {
-                fileRepo.delete(file);
-            }else {
-                throw new IOException("File non trovato nel database");
-            }
+            if(!Files.deleteIfExists(path))
+                throw new IOException("File non trovato nell archivio");
+
         }
 
 

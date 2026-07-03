@@ -43,11 +43,9 @@ public class UserEntity {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    // Un utente → molti file (file che possiede)
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<FileEntity> myFiles = new ArrayList<>() ;
 
-    // Un utente → molte condivisioni (file condivisi con lui)
     @OneToMany(mappedBy = "sharedWith", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SharedFile> sharedWithMe = new ArrayList<>();
 

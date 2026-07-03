@@ -33,7 +33,6 @@ public class UserController {
     @PostMapping("/login")
     public ResponseEntity<?> logIn(@Valid @RequestBody UserLoginDTO loginDTO,HttpServletRequest request, HttpServletResponse response) {
         try {
-            // Autenticazione utente
             Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                     loginDTO.getEmail(),

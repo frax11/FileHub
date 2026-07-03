@@ -22,6 +22,7 @@
 .btn-action.download { @apply text-blue-700 hover:text-blue-900; }
 .btn-action.share { @apply text-green-700 hover:text-green-900; }
 .btn-action.delete { @apply text-red-700 hover:text-red-900; }
+.btn-action.disable { @apply text-gray-700  }
 
 .share-row { @apply bg-green-100; }
 .share-cell { @apply p-3 border-b border-black; }
