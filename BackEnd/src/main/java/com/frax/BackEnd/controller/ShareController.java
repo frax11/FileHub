@@ -52,16 +52,6 @@ public class ShareController {
 
     }
 
-    @GetMapping("/check/all")
-    public ResponseEntity<?> checkAll(Authentication authentication) {
-
-        try {
-            return shareService.checkAll(authentication.getName());
-        } catch (Exception e) {
-            System.err.println(e.getMessage());
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-    }
 
     @DeleteMapping("/revoke/{fileId}")
     public ResponseEntity<?> revokeMyAccess(@PathVariable String fileId, Authentication authentication) {

@@ -11,13 +11,12 @@ import java.util.List;
 import java.util.Optional;
 
 public interface FileRepo extends JpaRepository<FileEntity, String> {
-    // Incrementa il contatore globale (operazione atomica)
     @Modifying
     @Transactional
     @Query("UPDATE FileEntity f " +
             "SET f.currentAccessCount = f.currentAccessCount + 1 " +
             "WHERE f.id = :fileId " +
-            "AND f.currentAccessCount < f.maxAccessCount")
+            "AND f.currentAccessCount+1 < f.maxAccessCount")
     int incrementGlobalAccessCount(@Param("fileId") String fileId);
 
     @Query("SELECT f FROM FileEntity f "
@@ -32,5 +31,4 @@ public interface FileRepo extends JpaRepository<FileEntity, String> {
 
     Optional<FileEntity> findFileById(String id);
 
-    Optional<List<FileEntity>>  findAllByOwner_Email(String ownerEmail);
 }

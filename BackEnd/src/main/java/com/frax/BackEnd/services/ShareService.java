@@ -26,7 +26,7 @@ public class ShareService {
     @Transactional
     public ResponseEntity<?> shareFileWithUsers(SharedRequestDTO request, String ownerEmail) {
 
-        String shareEmail =  request.getShareTo().toUpperCase();
+        String shareEmail = request.getShareTo().toUpperCase();
         UserEntity owner = userRepo.findByEmail(ownerEmail)
                 .orElseThrow(() -> new RuntimeException("Utente non trovato: " + ownerEmail));
         FileEntity file = fileRepo.findById(request.getId())
@@ -56,63 +56,26 @@ public class ShareService {
     }
 
     @Transactional
+
     public FileEntity getSharedFile(String fileId, String userEmail) {
-        UserEntity user = userRepo.findByEmail(userEmail)
-                .orElseThrow(() -> new RuntimeException("Utente non trovato: " + userEmail));
+        UserEntity user = userRepo
+                .findByEmail(userEmail)
+                .orElseThrow(() -> new SecurityException("Utente non trovato: " + userEmail));
 
-        FileEntity file = fileRepo.findById(fileId)
-                .orElseThrow(() -> new RuntimeException("File non trovato"));
-
-        // Verifica che l'utente abbia accesso
-        boolean hasAccess = sharedFileRepo.hasUserAccess(fileId, user)
-                || file.getOwner().getId().equals(user.getId());
-
-        if (!hasAccess) {
-            throw new RuntimeException("Non hai accesso a questo file");
-        }
-
-        // Verifica che ci siano ancora accessi GLOBALI disponibili
-        if (file.getCurrentAccessCount() >= file.getMaxAccessCount()) {
-            throw new RuntimeException("Limite di accessi esaurito (" + file.getMaxAccessCount() + " letture massime totali)");
-        }
-
-        // INCREMENTA IL CONTATORE GLOBALE (operazione atomica)
         int updated = fileRepo.incrementGlobalAccessCount(fileId);
         if (updated == 0) {
-            throw new RuntimeException("Impossibile accedere: limite raggiunto");
-        }
+            SharedFile sharedFile = sharedFileRepo
+                    .findByFile_IdAndSharedWith_Email(fileId, userEmail)
+                    .orElseThrow(() -> new RuntimeException("Nessuna condivisione trovata per questo file"));
 
-        return fileRepo.findById(fileId).orElseThrow(() -> new RuntimeException("File non trovato: " + file.getFileName()));
-    }
-
-    @Transactional
-    public ResponseEntity<?> checkAll(String userEmail) {
-        AtomicInteger count = new AtomicInteger();
-        List<FileEntity> userFiles = new ArrayList<>();
-
-        List<SharedFile> sharedFilesList = sharedFileRepo.findBySharedWith_Email(userEmail)
-                .orElse(List.of());
-
-        sharedFilesList.forEach(sharedFile -> {
-            FileEntity file=  fileRepo.findFileById(sharedFile.getFile().getId()).orElseThrow(() -> new RuntimeException("File non trovato"));
-            if (file.isShared() && file.getCurrentAccessCount() >= file.getMaxAccessCount()) {
-                sharedFileRepo.deleteByFile(file);
-                file.setShared(false);
-                file.setCurrentAccessCount(0);
-                fileRepo.save(file);
-                count.getAndIncrement();
-            } else{
-                userFiles.add(file);
+            if (user.getSharedWithMe() != null) {
+                user.getSharedWithMe().remove(sharedFile);
+                sharedFileRepo.delete(sharedFile);
             }
-        });
-
-        for (FileEntity f : userFiles) {
-            System.out.println(f.getFileName());
-            System.out.println(f.getMaxAccessCount());
-            System.out.println(f.getCurrentAccessCount());
         }
-        return ResponseEntity.ok("Pulizia completata. Sono stati revocati gli accessi a " + count.get() + " file esauriti.");
+        return fileRepo.findById(fileId).orElseThrow(() -> new RuntimeException("File non trovato"));
     }
+
 
     @Transactional
     public void revokeAccess(String fileId, String email) {
